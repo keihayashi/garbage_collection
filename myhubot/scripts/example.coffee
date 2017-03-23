@@ -10,7 +10,7 @@
 cronJob = require('cron').CronJob
 
 module.exports = (robot) ->
-  cronJob = new cronJob('00 00 23 * * 3', () ->
+  cronJob = new cronJob('15 23 * * 3', () ->
     envelope = room: "#garbage_collection"
     robot.send envelope, "Hi, don't forget to put garbages out of the house! :)"
    )
