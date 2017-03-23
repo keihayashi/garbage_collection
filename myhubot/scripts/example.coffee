@@ -7,10 +7,15 @@
 #   Uncomment the ones you want to try and experiment with.
 #
 #   These are from the scripting documentation: https://github.com/github/hubot/blob/master/docs/scripting.md
+cronJob = require('cron').CronJob
 
 module.exports = (robot) ->
-  robot.respond /hi/i, (msg) ->
-      msg.send 'Hi'
+  cronJob = new cronJob('00 40 22 * * 3', () ->
+    envelope = room: "#general"
+    robot.send envelope, "Hi, don't forget to put garbages out of the house! :)"
+   )
+
+   cronJob.start()
   # robot.hear /badger/i, (res) ->
   #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
   #
