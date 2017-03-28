@@ -13,17 +13,28 @@ cronJob = require('cron').CronJob
 module.exports = (robot) ->
   robot.hear /hi/i, (msg) ->
     user_name = msg.message.user.name
-    msg.send "@#{user_name} will throw garbage next time."
-    if not robot.brain.data[user_name]:
-      robot.brain.data[user_name] = 0
-    robot.brain.data[user_name]++
-    robot.brain.save()
-    msg.send "count for #{user_name}: #{robot.brain.data[user_name]}"
+    msg.send "#{user_name} will throw garbage next time."
+    time = robot.brain.get(user_name) ? 0
+    time++
+    robot.brain.set(user_name, time)
+    msg.send "#{time} recorded for #{user_name}"
 
   cronJob = new cronJob('0 22 * * 2', () ->
     envelope = room: "#garbage_collection"
-    mentions = ["@aaa: ", "@bbb: ", "@ccc: ", "@ddd: "]
-    robot.send envelope, mentions[random(mentions.length)] + "Hi, don't forget to put garbages out of the house! :)"
+    members = ["aaa", "bbb", "ccc", "ddd"]
+    time = 0
+    name = ""
+    for m in members
+      cur_time = robot.brain.get(m) ? 0
+      if cur_time  > 0
+        time = cur_time
+        name = m
+        break
+    if time > 0
+      robot.brain.set(name, time - 1)
+      robot.send envelope, "@" + name + ": " + "Hi, it is your turn. Don't forget to put garbages out of the house! :)"
+    else
+      robot.send envelope, "@" + members[random(members.length)] + ": Hi, you are choosed to put garbages out of the house tonight! :)"
    )
 
    cronJob.start()
