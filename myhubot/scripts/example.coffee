@@ -7,12 +7,23 @@
 #   Uncomment the ones you want to try and experiment with.
 #
 #   These are from the scripting documentation: https://github.com/github/hubot/blob/master/docs/scripting.md
+random = (n) -> Math.floor(Math.random() * n)
 cronJob = require('cron').CronJob
 
 module.exports = (robot) ->
-  cronJob = new cronJob('0 22 * * 3', () ->
+  robot.hear /hi/i, (msg) ->
+    user_name = msg.message.user.name
+    msg.send "@#{user_name} will throw garbage next time."
+    if not robot.brain.data[user_name]:
+      robot.brain.data[user_name] = 0
+    robot.brain.data[user_name]++
+    robot.brain.save()
+    msg.send "count for #{user_name}: #{robot.brain.data[user_name]}"
+
+  cronJob = new cronJob('0 22 * * 2', () ->
     envelope = room: "#garbage_collection"
-    robot.send envelope, "Hi, don't forget to put garbages out of the house! :)"
+    mentions = ["@aaa: ", "@bbb: ", "@ccc: ", "@ddd: "]
+    robot.send envelope, mentions[random(mentions.length)] + "Hi, don't forget to put garbages out of the house! :)"
    )
 
    cronJob.start()
