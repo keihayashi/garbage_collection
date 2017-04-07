@@ -11,6 +11,11 @@ random = (n) -> Math.floor(Math.random() * n)
 cronJob = require('cron').CronJob
 
 module.exports = (robot) ->
+  robot.hear /open/i, (msg) ->
+    msg.http('URL_OF_IFTTTT_TO_UNLOCK_THE_DOOR')
+      .post() (err, res, body) ->
+         msg.send msg.message.user.name + " opened the door!"
+
   robot.hear /hi/i, (msg) ->
     user_name = msg.message.user.name
     msg.send "#{user_name} will throw garbage next time."
